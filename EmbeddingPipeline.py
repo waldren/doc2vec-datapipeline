@@ -21,7 +21,7 @@ class EmbeddingPipeline:
     self.method = method
     self.process_ct = process_ct
 
-
+  # New normalization pipeline that replaces the cookbook code
   def normalize(self, text):
     #Strip non letters
     text = tf.strings.regex_replace(text, pattern='[^A-Za-z ]', rewrite='')
@@ -38,7 +38,7 @@ class EmbeddingPipeline:
     return text
 
 
-    
+    # Code is from cookbook
     # Turn text data into lists of integers from dictionary
   def text_to_numbers(self, sentences):
     # Initialize the returned data
@@ -55,7 +55,7 @@ class EmbeddingPipeline:
       data.append(sentence_data)
     return(data)
     
-
+  # Code is from
   # https://stackoverflow.com/questions/35857519/efficiently-count-word-frequencies-in-python
   def build_dictionary(self, sentences):
     # Note that `ngram_range=(1, 1)` means we want to extract Unigrams, i.e. tokens.
@@ -77,7 +77,7 @@ class EmbeddingPipeline:
     
     return freq_distribution.most_common(self.vocabulary_size)  
 
-    
+  # This is not working and not finished
   def generate_window_sequence(self, sentence_ix, sentence, label):
     window_sequences = []
     offset = int(self.window_size/2)
@@ -92,6 +92,7 @@ class EmbeddingPipeline:
 
     return sentence_ix, window_sequences, label
   
+  # This is part of the original cookbook code that I am trying to replace using tf.Data pipeline
   def nofunct(self, x):
     window_sequences = [sentence[max((ix-window_size),0):(ix+window_size+1)] for ix, x in enumerate(sentence)]
     label_indices = [ix if ix<window_size else window_size for ix,x in enumerate (window_sequences)]
