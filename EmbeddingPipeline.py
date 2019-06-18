@@ -13,13 +13,14 @@ from sklearn.feature_extraction.text import CountVectorizer
 from string import digits
 
 class EmbeddingPipeline:
-  def __init__(self, window_size=2, method="doc2vec", stop_words=[], vocabulary_size=100, word_dict={}, process_ct=32):
+  def __init__(self, session, window_size=2, method="doc2vec", stop_words=[], vocabulary_size=100, word_dict={}, process_ct=32):
     self.window_size = window_size
     self.stop_words = stop_words
     self.vocabulary_size = vocabulary_size
     self.word_dict = word_dict
     self.method = method
     self.process_ct = process_ct
+    self.session = session
 
   # New normalization pipeline that replaces the cookbook code
   def normalize(self, text):
@@ -80,17 +81,37 @@ class EmbeddingPipeline:
   # This is not working and not finished
   def generate_window_sequence(self, sentence_ix, sentence, label):
     window_sequences = []
-    offset = int(self.window_size/2)
+    
     ws = tf.strings.split([sentence], sep=' ').values
-    ls = ws.get_shape()[0].value
-    print(ls)
-    for i in range(offset, ls-offset):
-
-      window_sequences.append((tf.gather_nd(ws, [i-offset]), tf.gather_nd(ws, [i]) ))
-      window_sequences.append((tf.gather_nd(ws, [i+offset]), tf.gather_nd(ws, [i]) ))
-
+    print('--------')
+    print(tf.size(ws)-self.window_size)
+    print('--------')
+    
+    offset = tf.constant(int(self.window_size/2))
+    i = tf.constant(int(self.window_size/2))
+    def while_condition (i, window_sequences, offset):
+     return tf.less(i, tf.math.subtract(tf.size(ws), offset))
+    
+    def body(i, window_sequences, offset):
+      #TODO - move within office if it is > 1
+      before = tf.math.subtract(i, offset)
+      after = tf.math.add(i, offset)
+      window_sequences.append((tf.gather(ws, [before, i])))
+      window_sequences.append((tf.gather(ws, [after, i])))
+      return [tf.math.add(i,1), window_sequences, offset]
+      
+    window_sequences = []
+    r = tf.while_loop(while_condition, body, [i, window_sequences, offset])
 
     return sentence_ix, window_sequences, label
+
+  def build_windows(self, i):
+    window_sequences = []
+    offset = tf.constant(int(self.window_size/2))
+    # TODO - move within offset if < 1
+    window_sequences.append((words[i-offset], words[i]))
+    window_sequences.append((words[i+offset], words[i]))
+    return window_sequences
   
   # This is part of the original cookbook code that I am trying to replace using tf.Data pipeline
   def nofunct(self, x):
