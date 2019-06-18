@@ -1,5 +1,5 @@
 # doc2vec-datapipeline
-Working on converting a doc2vec feed-dict based implementation to one that uses tf.data to boost performance
+Working on converting a doc2vec feed-dict based implementation to one that uses tf.data to boost performance. Original implmentation did not max out even one core of a 32 core CPU nor 1 of two 1080Ti GPUs.
 
 ## Original Code 
 from https://github.com/nfmcclure/tensorflow_cookbook/tree/master/07_Natural_Language_Processing/07_Sentiment_Analysis_With_Doc2Vec
