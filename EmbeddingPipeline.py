@@ -80,17 +80,14 @@ class EmbeddingPipeline:
 
   # This is not working and not finished
   def generate_window_sequence(self, sentence_ix, sentence, label):
-    window_sequences = []
     
     ws = tf.strings.split([sentence], sep=' ').values
-    print('--------')
-    print(tf.size(ws)-self.window_size)
-    print('--------')
-    
+
     offset = tf.constant(int(self.window_size/2))
     i = tf.constant(int(self.window_size/2))
+
     def while_condition (i, window_sequences, offset):
-     return tf.less(i, tf.math.subtract(tf.size(ws), offset))
+      return tf.less(i, tf.math.subtract(tf.size(ws), offset))
     
     def body(i, window_sequences, offset):
       #TODO - move within office if it is > 1
