@@ -86,19 +86,19 @@ class EmbeddingPipeline:
     offset = tf.constant(int(self.window_size/2))
     i = tf.constant(int(self.window_size/2))
 
-    def while_condition (i, window_sequences, offset):
+    def while_condition (i, window_sequences, ws, offset):
       return tf.less(i, tf.math.subtract(tf.size(ws), offset))
     
-    def body(i, window_sequences, offset):
-      #TODO - move within office if it is > 1
+    def body(i, window_sequences, ws, offset):
+      #TODO - move within offest if it is > 1
       before = tf.math.subtract(i, offset)
       after = tf.math.add(i, offset)
-      window_sequences.append((tf.gather(ws, [before, i])))
-      window_sequences.append((tf.gather(ws, [after, i])))
-      return [tf.math.add(i,1), window_sequences, offset]
+      #window_sequences.append((tf.gather(ws, [before, i])))
+      #window_sequences.append((tf.gather(ws, [after, i])))
+      return i+1, window_sequences, offset
       
     window_sequences = []
-    r = tf.while_loop(while_condition, body, [i, window_sequences, offset])
+    r = tf.while_loop(while_condition, body, [i, window_sequences, ws, offset])
 
     return sentence_ix, window_sequences, label
 
